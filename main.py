@@ -1,13 +1,14 @@
 import pandas as pd
 import os
 from fastapi import FastAPI, HTTPException, Query
-from models import User, ItemArray, Error
+from models import User, ItemArray, Error, UserCreationDTO
 from exceptions import UserNotFoundException
 from recommendation import get_k_recommendations
 
 app = FastAPI(title="Sistema Recomendador - Ciencia de Datos 2025")
 CSV_FILE = "database/usuarios.csv"
 PREF_CSV = "database/preferencias.csv"
+GAMES_CSV = "database/games.csv"
 
 def init_db():
     if not os.path.exists(CSV_FILE):
@@ -51,28 +52,44 @@ def get_user_or_404(user_id: int) -> User:
         },
     )
 
-# ----- ENDPOINTS -----
-@app.post("/user", response_model=User, tags=["CRUD: Usuario"])
-async def create_user(user: User):
+def get_next_user_id() -> int:
     df = pd.read_csv(CSV_FILE)
 
-    if user.id in df["id"].values:
-        raise HTTPException(status_code=400, detail="El ID de usuario ya existe")
+    if df.empty or "id" not in df.columns:
+        return 1
+
+    ids = pd.to_numeric(df["id"], errors="coerce").dropna().astype(int)
+    if ids.empty:
+        return 1
+
+    used = set(ids.tolist())
+    new_id = 1
+    while new_id in used:
+        new_id += 1
+    return new_id
+
+# ----- ENDPOINTS -----
+@app.post("/user", response_model=User, tags=["CRUD: Usuario"])
+async def create_user(payload: UserCreationDTO):
+    df = pd.read_csv(CSV_FILE)
+    user_id = get_next_user_id()
+
+    attrs = payload.attributes 
 
     new_user_row = {
-        "id": user.id,
-        "username": user.username,
-        "open_word_action_preference": user.attributes.get("open_word_action_preference", 0.0),
-        "fps_preference": user.attributes.get("fps_preference", 0.0),
-        "survival_preference": user.attributes.get("survival_preference", 0.0),
-        "action_rpg_preference": user.attributes.get("action_rpg_preference", 0.0),
-        "linear_action_adventure_preference": user.attributes.get("linear_action_adventure_preference", 0.0),
+        "id": user_id,
+        "username": payload.username,
+        "open_world_action_preference": attrs.open_world_action_preference,
+        "fps_preference": attrs.fps_preference,
+        "survival_preference": attrs.survival_preference,
+        "action_rpg_preference": attrs.action_rpg_preference,
+        "linear_action_adventure_preference": attrs.linear_action_adventure_preference,
     }
 
     df = pd.concat([df, pd.DataFrame([new_user_row])], ignore_index=True)
     df.to_csv(CSV_FILE, index=False)
 
-    return user
+    return User(id=user_id, username=payload.username, attributes=payload.attributes)
 
 @app.get("/user/{userId}", response_model=User, tags=["CRUD: Usuario"])
 async def get_user(userId: int):

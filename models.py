@@ -14,14 +14,17 @@ class Error(BaseModel):
     message: str
 
 class UserAttributes(BaseModel):
-    open_word_action_preference: float
+    open_world_action_preference: float
     fps_preference: float
     survival_preference: float
     action_rpg_preference: float
     linear_action_adventure_preference: float
 
-
 class User(BaseModel):
     id: int
+    username: str
+    attributes: UserAttributes
+
+class UserCreationDTO(BaseModel):
     username: str
     attributes: UserAttributes
