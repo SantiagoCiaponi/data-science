@@ -1,3 +1,5 @@
+from exceptions import UserNotFoundException
+
 def get_csv_user(user_id: int) -> User:
     df = pd.read_csv(CSV_FILE)
     user_row = df[df["id"] == user_id]
