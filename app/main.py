@@ -1,12 +1,15 @@
 import pandas as pd
 import os
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 
 from .models import User, ItemArray, UserCreationDTO
 from .recommendation import get_k_recommendations
-from .users_logic import get_csv_user, get_next_user_id
+from .users_logic import (
+    get_csv_user,
+    get_next_user_id,
+    update_user_preferences_from_game,
+)
 from config import CSV_FILE, PREF_CSV, GAMES_CSV
-
 app = FastAPI(title="Sistema Recomendador - Ciencia de Datos 2025")
 
 def init_db():
@@ -66,6 +69,15 @@ async def get_recommendations(userId: int, n: int = Query(5)):
 async def add_preference(userId: int, itemId: int, ranking: int):
     user = get_csv_user(userId)
 
+    df_games = pd.read_csv(GAMES_CSV)
+    game_row = df_games[df_games["id"] == itemId]
+
+    if game_row.empty:
+        raise HTTPException(status_code=404, detail=f"Juego {itemId} no encontrado")
+
+    selected_game = game_row.iloc[0]
+
+    # Añadimos la preferencia 
     df_p = pd.read_csv(PREF_CSV)
     new_pref = {
         "userId": user.id,
@@ -75,9 +87,14 @@ async def add_preference(userId: int, itemId: int, ranking: int):
     df_p = pd.concat([df_p, pd.DataFrame([new_pref])], ignore_index=True)
     df_p.to_csv(PREF_CSV, index=False)
 
+    update_user_preferences_from_game(user.id, selected_game, ranking)
+
+    updated_user = get_csv_user(user.id)
+
     return {
-        "message": "Preferencia registrada",
+        "message": "Preferencia registrada y perfil actualizado",
         "userId": user.id,
         "itemId": itemId,
         "ranking": ranking,
+        "updatedAttributes": updated_user.attributes,
     }
