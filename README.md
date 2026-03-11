@@ -23,11 +23,11 @@ Este proyecto constituye el Trabajo Integrador de la cátedra. Consiste en una A
     ```
 3. **Iniciar el servidor:**:
     ```bash
-    uvicorn main:app --reload
+    uvicorn app.main:app --reload
     ```
     o
     ```bash
-    python -m uvicorn main:app --reload
+    python -m uvicorn app.main:app --reload
     ```
 3. **Usar la movida:**:
     toda la movida va a estar en:

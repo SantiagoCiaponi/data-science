@@ -1,7 +1,7 @@
 import pandas as pd
 
-from exceptions import UserNotFoundException
-from models import User
+from .exceptions import UserNotFoundException
+from .models import User
 from config import CSV_FILE
 
 def get_csv_user(user_id: int) -> User:

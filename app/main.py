@@ -2,9 +2,9 @@ import pandas as pd
 import os
 from fastapi import FastAPI, Query
 
-from models import User, ItemArray, UserCreationDTO
-from recommendation import get_k_recommendations
-from users_logic import get_csv_user, get_next_user_id
+from .models import User, ItemArray, UserCreationDTO
+from .recommendation import get_k_recommendations
+from .users_logic import get_csv_user, get_next_user_id
 from config import CSV_FILE, PREF_CSV, GAMES_CSV
 
 app = FastAPI(title="Sistema Recomendador - Ciencia de Datos 2025")
