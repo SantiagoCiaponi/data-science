@@ -1,4 +1,6 @@
 from exceptions import UserNotFoundException
+from models import User, UserCreationDTO, UserAttributes
+
 
 def get_csv_user(user_id: int) -> User:
     df = pd.read_csv(CSV_FILE)
