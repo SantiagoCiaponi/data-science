@@ -54,6 +54,7 @@ def update_user_preferences_from_game(user_id: int, game_row, ranking: int) -> N
 
     idx = user_index[0]
 
+    # Mide cuanto ajusta cada ranking
     ranking_delta_map = {
         1: -0.5,
         2: -0.25,
