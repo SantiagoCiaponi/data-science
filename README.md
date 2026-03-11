@@ -25,6 +25,10 @@ Este proyecto constituye el Trabajo Integrador de la cátedra. Consiste en una A
     ```bash
     uvicorn main:app --reload
     ```
+    o
+    ```bash
+    python -m uvicorn main:app --reload
+    ```
 3. **Usar la movida:**:
     toda la movida va a estar en:
     ```bash
