@@ -54,8 +54,11 @@ def update_user_preferences_from_game(user_id: int, game_row, ranking: int) -> N
 
     idx = user_index[0]
 
-    # Mide cuanto ajusta cada ranking
-    ranking_delta_map = {
+    # Tasa de aprendizaje 
+    alpha = 1.0
+
+    # f(r): transformación del ranking a peso
+    ranking_weight_map = {
         1: -0.5,
         2: -0.25,
         3: 0.0,
@@ -63,7 +66,7 @@ def update_user_preferences_from_game(user_id: int, game_row, ranking: int) -> N
         5: 0.5,
     }
 
-    delta = ranking_delta_map.get(ranking, 0.0)
+    ranking_weight = ranking_weight_map.get(ranking, 0.0)
 
     game_to_user_map = {
         "open_world_action": "open_world_action_preference",
@@ -76,7 +79,10 @@ def update_user_preferences_from_game(user_id: int, game_row, ranking: int) -> N
     for game_col, user_col in game_to_user_map.items():
         game_value = float(game_row.get(game_col, 0))
         current_value = float(df.at[idx, user_col])
-        new_value = clamp_preference(current_value + delta * game_value)
+
+        # u_i = clamp(u_i + alpha * f(r) * x_i)
+        new_value = clamp_preference(current_value + alpha * ranking_weight * game_value)
+
         df.at[idx, user_col] = new_value
 
     df.to_csv(CSV_FILE, index=False)
