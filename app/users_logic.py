@@ -54,16 +54,16 @@ def update_user_preferences_from_game(user_id: int, game_row, ranking: int) -> N
 
     idx = user_index[0]
 
-    # Tasa de aprendizaje 
-    alpha = 1.0
+    # alpha: peso de la transformación
+    alpha = 0.5;
 
     # f(r): transformación del ranking a peso
     ranking_weight_map = {
-        1: -0.5,
-        2: -0.25,
+        1: -0.25,
+        2: -0.10,
         3: 0.0,
-        4: 0.25,
-        5: 0.5,
+        4: 0.20,
+        5: 0.10,
     }
 
     ranking_weight = ranking_weight_map.get(ranking, 0.0)
