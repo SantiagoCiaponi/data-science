@@ -10,7 +10,8 @@ from .users_logic import (
     update_user_preferences_from_game,
 )
 from config import CSV_FILE, PREF_CSV, GAMES_CSV
-app = FastAPI(title="Sistema Recomendador - Ciencia de Datos 2025")
+app = FastAPI(title="Sistema Recomendador - Ciencia de Datos 2025",
+              docs_url="/")
 
 def init_db():
     if not os.path.exists(CSV_FILE):
