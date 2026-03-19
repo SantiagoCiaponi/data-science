@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 from typing import List
+
+from pydantic import BaseModel
+
 
 class Item(BaseModel):
     id: int
@@ -28,3 +30,30 @@ class User(BaseModel):
 class UserCreationDTO(BaseModel):
     username: str
     attributes: UserAttributes
+
+class Game(BaseModel):
+    id: int
+    title: str
+    description: str
+    platforms: str
+
+
+class GameArray(BaseModel):
+    games: List[Game]
+
+class PreferenceCreateDTO(BaseModel):
+    user_id: int
+    item_id: int
+    ranking: int
+
+class Preference(BaseModel):
+    userId: int
+    itemId: int
+    ranking: int
+
+class PreferenceCreatedResponse(BaseModel):
+    message: str
+    userId: int
+    itemId: int
+    ranking: int
+    updatedAttributes: UserAttributes
