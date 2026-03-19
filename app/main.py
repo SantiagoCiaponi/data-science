@@ -1,21 +1,11 @@
 from fastapi import FastAPI, Query
-
-from .models import (
-    Game,
-    GameArray,
-    ItemArray,
-    PreferenceCreateDTO,
-    PreferenceCreatedResponse,
-    User,
-    UserCreationDTO,
-)
+from .models import (Game, GameArray, ItemArray, PreferenceCreateDTO, PreferenceCreatedResponse, User, UserCreationDTO)
 from .logics.games_logic import get_all_games, get_game
 from .logics.preferences_logic import create_preference, initialize_preferences_storage
 from .logics.recommendation import get_k_recommendations
 from .logics.users_logic import create_user, get_csv_user, initialize_users_storage
 
 app = FastAPI(title="Sistema Recomendador - Ciencia de Datos 2025", docs_url="/")
-
 
 def init_db() -> None:
     initialize_users_storage()
@@ -47,12 +37,7 @@ async def get_recommendations(userId: int, n: int = Query(5)):
     items = get_k_recommendations(user.id, n)
     return ItemArray(items=items)
 
-@app.post(
-    "/user/{userId}/preference/{itemId}",
-    response_model=PreferenceCreatedResponse,
-    tags=["Sistema Recomendador"],
-)
-
+@app.post("/user/{userId}/preference/{itemId}", response_model=PreferenceCreatedResponse, tags=["Sistema Recomendador"])
 async def add_preference(userId: int, itemId: int, ranking: int):
     payload = PreferenceCreateDTO(user_id=userId, item_id=itemId, ranking=ranking)
     return create_preference(payload)

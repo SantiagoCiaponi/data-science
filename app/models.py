@@ -1,7 +1,5 @@
 from typing import List
-
 from pydantic import BaseModel
-
 
 class Item(BaseModel):
     id: int
@@ -36,7 +34,13 @@ class Game(BaseModel):
     title: str
     description: str
     platforms: str
-
+    metascore: float
+    userscore: float
+    action_rpg: int
+    fps: int
+    linear_action_adventure: int
+    open_world_action: int
+    survival: int
 
 class GameArray(BaseModel):
     games: List[Game]

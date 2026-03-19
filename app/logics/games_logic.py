@@ -3,6 +3,21 @@ import config
 from fastapi import HTTPException
 from ..models import Game
 
+def build_game_from_row(row: pd.Series) -> Game:
+    return Game(
+        id=int(row[config.GAME_ID_COLUMN]),
+        title=row[config.GAME_TITLE_COLUMN],
+        description=row.get(config.GAME_DESCRIPTION_COLUMN, ""),
+        platforms=row.get(config.GAME_PLATFORMS_COLUMN, ""),
+        metascore=float(row.get(config.GAME_METASCORE_COLUMN, 0)),
+        userscore=float(row.get(config.GAME_USERSCORE_COLUMN, 0)),
+        action_rpg=int(row.get(config.ACTION_RPG_COLUMN, 0)),
+        fps=int(row.get(config.FPS_COLUMN, 0)),
+        linear_action_adventure=int(row.get(config.LINEAR_ACTION_ADVENTURE_COLUMN, 0)),
+        open_world_action=int(row.get(config.OPEN_WORLD_ACTION_COLUMN, 0)),
+        survival=int(row.get(config.SURVIVAL_COLUMN, 0)),
+    )
+
 def read_games_df() -> pd.DataFrame:
     return pd.read_csv(config.GAMES_CSV)
 
@@ -17,21 +32,8 @@ def get_game_row(game_id: int) -> pd.Series:
 
 def get_game(game_id: int) -> Game:
     row = get_game_row(game_id)
-    return Game(
-        id=int(row[config.GAME_ID_COLUMN]),
-        title=row[config.GAME_TITLE_COLUMN],
-        description=row.get(config.GAME_DESCRIPTION_COLUMN, ""),
-        platforms=row.get(config.GAME_PLATFORMS_COLUMN, ""),
-    )
+    return build_game_from_row(row)
 
 def get_all_games() -> list[Game]:
     df = read_games_df()
-    return [
-        Game(
-            id=int(row[config.GAME_ID_COLUMN]),
-            title=row[config.GAME_TITLE_COLUMN],
-            description=row.get(config.GAME_DESCRIPTION_COLUMN, ""),
-            platforms=row.get(config.GAME_PLATFORMS_COLUMN, ""),
-        )
-        for _, row in df.iterrows()
-    ]
+    return [build_game_from_row(row) for _, row in df.iterrows()]
