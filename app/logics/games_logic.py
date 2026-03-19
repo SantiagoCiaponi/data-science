@@ -1,7 +1,7 @@
 import pandas as pd
 import config
 from fastapi import HTTPException
-from ..models import Game
+from ..models import Game, Item
 
 def build_game_from_row(row: pd.Series) -> Game:
     return Game(
@@ -17,6 +17,23 @@ def build_game_from_row(row: pd.Series) -> Game:
         open_world_action=int(row.get(config.OPEN_WORLD_ACTION_COLUMN, 0)),
         survival=int(row.get(config.SURVIVAL_COLUMN, 0)),
     )
+
+def get_game_genres(row: pd.Series) -> list[str]:
+    genres = []
+    for column in config.GAME_TO_USER_ATTRIBUTE_MAP:
+        if int(row.get(column, 0)) == 1:
+            genres.append(column)
+    return genres
+
+def build_item_from_row(row: pd.Series) -> Item:
+    return Item(
+        id=int(row[config.GAME_ID_COLUMN]),
+        name=row[config.GAME_TITLE_COLUMN],
+        genre=", ".join(get_game_genres(row)),
+    )
+
+def get_game_feature_vector(row: pd.Series) -> list[float]:
+    return [float(row.get(column, 0)) for column in config.GAME_TO_USER_ATTRIBUTE_MAP]
 
 def read_games_df() -> pd.DataFrame:
     return pd.read_csv(config.GAMES_CSV)

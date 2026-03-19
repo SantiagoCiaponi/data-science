@@ -1,10 +1,36 @@
+### Parámetros para la lógica de recomendaciones
+RECOMMENDATION_CONTENT_WEIGHT = 0.8
+COLLABORATIVE_RANKING_MAP = {
+    1: -1.0,
+    2: -0.5,
+    3: 0.0,
+    4: 0.5,
+    5: 1.0,
+}
+
+PREFERENCE_MIN_VALUE = 0.0
+PREFERENCE_MAX_VALUE = 10.0
+PREFERENCE_UPDATE_ALPHA = 0.5
+
+RANKING_WEIGHT_MAP = {
+    1: -0.25,
+    2: -0.10,
+    3: 0.0,
+    4: 0.20,
+    5: 0.10,
+}
+
+# Paths
 USERS_CSV = "database/usuarios.csv"
 PREFERENCES_CSV = "database/preferencias.csv"
 GAMES_CSV = "database/juegos.csv"
 
+### Columnas de los CSV
+# User
 USER_ID_COLUMN = "id"
 USERNAME_COLUMN = "username"
 
+# Juego
 GAME_ID_COLUMN = "id"
 GAME_TITLE_COLUMN = "title"
 GAME_DESCRIPTION_COLUMN = "description"
@@ -12,22 +38,26 @@ GAME_PLATFORMS_COLUMN = "platforms"
 GAME_METASCORE_COLUMN = "metascore"
 GAME_USERSCORE_COLUMN = "userscore"
 
+# Preferencias 
 PREFERENCE_USER_ID_COLUMN = "userId"
 PREFERENCE_ITEM_ID_COLUMN = "itemId"
 PREFERENCE_RANKING_COLUMN = "ranking"
 
+# Preferencia de los usuarios sobre los géneros de los juegos
 OPEN_WORLD_ACTION_PREFERENCE = "open_world_action_preference"
 FPS_PREFERENCE = "fps_preference"
 SURVIVAL_PREFERENCE = "survival_preference"
 ACTION_RPG_PREFERENCE = "action_rpg_preference"
 LINEAR_ACTION_ADVENTURE_PREFERENCE = "linear_action_adventure_preference"
 
+# One-hot encoding de géneros de juegos
 OPEN_WORLD_ACTION_COLUMN = "open_world_action"
 FPS_COLUMN = "fps"
 SURVIVAL_COLUMN = "survival"
 ACTION_RPG_COLUMN = "action_rpg"
 LINEAR_ACTION_ADVENTURE_COLUMN = "linear_action_adventure"
 
+# Listas de columnas
 GAME_COLUMNS = [
     GAME_ID_COLUMN,
     GAME_TITLE_COLUMN,
@@ -68,16 +98,4 @@ GAME_TO_USER_ATTRIBUTE_MAP = {
     SURVIVAL_COLUMN: SURVIVAL_PREFERENCE,
     ACTION_RPG_COLUMN: ACTION_RPG_PREFERENCE,
     LINEAR_ACTION_ADVENTURE_COLUMN: LINEAR_ACTION_ADVENTURE_PREFERENCE,
-}
-
-PREFERENCE_MIN_VALUE = 0.0
-PREFERENCE_MAX_VALUE = 10.0
-PREFERENCE_UPDATE_ALPHA = 0.5
-
-RANKING_WEIGHT_MAP = {
-    1: -0.25,
-    2: -0.10,
-    3: 0.0,
-    4: 0.20,
-    5: 0.10,
 }

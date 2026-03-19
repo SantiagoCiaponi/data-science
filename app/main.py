@@ -2,7 +2,7 @@ from fastapi import FastAPI, Query
 from .models import (Game, GameArray, ItemArray, PreferenceCreateDTO, PreferenceCreatedResponse, User, UserCreationDTO)
 from .logics.games_logic import get_all_games, get_game
 from .logics.preferences_logic import create_preference, initialize_preferences_storage
-from .logics.recommendation import get_k_recommendations
+from .logics.recommendations_logic import get_k_recommendations
 from .logics.users_logic import create_user, get_csv_user, initialize_users_storage
 
 app = FastAPI(title="Sistema Recomendador - Ciencia de Datos 2025", docs_url="/")

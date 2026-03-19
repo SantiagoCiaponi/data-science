@@ -76,15 +76,6 @@ def create_user(payload: UserCreationDTO) -> User:
 
     return User(id=user_id, username=payload.username, attributes=payload.attributes)
 
-# Limita el valor de una preferencia al rango permitido
-def clamp_preference(value: float) -> float:
-    return max(config.PREFERENCE_MIN_VALUE, min(config.PREFERENCE_MAX_VALUE, value))
-
-def get_new_user_preference_value (current_value: float, game_value: float, ranking: int) -> float:
-    ranking_weight = config.RANKING_WEIGHT_MAP.get(ranking, 0.0)
-    # u_i = clamp(u_i + alpha * f(r) * x_i)
-    return clamp_preference(current_value + config.PREFERENCE_UPDATE_ALPHA * ranking_weight * game_value)
-
 # Actualiza las preferencias de un usuario a partir de un juego y un ranking dado por el usuario
 def update_user_preferences_from_game(user_id: int, game_row, ranking: int) -> None:
     df = read_users_df()
@@ -103,3 +94,17 @@ def update_user_preferences_from_game(user_id: int, game_row, ranking: int) -> N
         df.at[idx, user_column] = new_value
 
     save_users_df(df)
+    
+# Limita el valor de una preferencia al rango permitido
+def clamp_preference(value: float) -> float:
+    return max(config.PREFERENCE_MIN_VALUE, min(config.PREFERENCE_MAX_VALUE, value))
+
+def get_new_user_preference_value (current_value: float, game_value: float, ranking: int) -> float:
+    ranking_weight = config.RANKING_WEIGHT_MAP.get(ranking, 0.0)
+    # u_i = clamp(u_i + alpha * f(r) * x_i)
+    return clamp_preference(current_value + config.PREFERENCE_UPDATE_ALPHA * ranking_weight * game_value)
+    
+# Obtiene el vector de preferencias de un usuario
+def get_user_preference_vector(user: User) -> list[float]:
+    attributes = user.attributes.model_dump()
+    return [float(attributes[column]) for column in config.USER_ATTRIBUTE_COLUMNS]
