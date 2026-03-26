@@ -1,4 +1,5 @@
 import math
+import random
 import pandas as pd
 import config
 from ..models import Item, User
@@ -36,8 +37,11 @@ def get_k_recommendations(user_id: int, k: int) -> list[Item]:
     # Ordenamos los juegos de mayor a menor score_calculado
     scored_games.sort(key=lambda game_data: game_data["score"], reverse=True)
 
+    candidate_pool = scored_games[:max(k, k * 2)]
+    selected_games = get_random_recommendation_sample(candidate_pool, k)
+
     recommended_items: list[Item] = []
-    for game_data in scored_games[:k]:
+    for game_data in selected_games:
         recommended_items.append(build_item_from_row(game_data["row"]))
 
     return recommended_items
@@ -47,8 +51,10 @@ def get_k_recommendations(user_id: int, k: int) -> list[Item]:
 def get_final_score(user: User, game_row: pd.Series) -> float:
     content_score = get_content_score(user, game_row)
     collaborative_score = get_collaborative_score(user, int(game_row[config.GAME_ID_COLUMN]))
-    alpha = config.RECOMMENDATION_CONTENT_WEIGHT
-    return alpha * content_score + (1 - alpha) * collaborative_score
+    base_score = get_base_score(content_score, collaborative_score)
+    serendipity_score = get_serendipity_score(content_score, collaborative_score, game_row)
+    beta = config.RECOMMENDATION_SERENDIPITY_WEIGHT
+    return (1 - beta) * base_score + beta * serendipity_score
 
 # Calcula el score basado en contenido entre un usuario y un juego
 # score_contenido(u, i) representa la afinidad entre ambos vectores
@@ -56,6 +62,10 @@ def get_content_score(user: User, game_row: pd.Series) -> float:
     user_vector = get_user_preference_vector(user)
     game_vector = get_game_feature_vector(game_row)
     return cosine_similarity(user_vector, game_vector)
+
+def get_base_score(content_score: float, collaborative_score: float) -> float:
+    alpha = config.RECOMMENDATION_CONTENT_WEIGHT
+    return alpha * content_score + (1 - alpha) * collaborative_score
 
 # g(r) diferencia valoraciones negativas, neutras y positivas
 def transform_collaborative_ranking(ranking: int) -> float:
@@ -125,6 +135,39 @@ def get_similarity_between_users(target_user: User, other_user: User) -> float:
     target_user_vector = get_user_preference_vector(target_user)
     other_user_vector = get_user_preference_vector(other_user)
     return cosine_similarity(target_user_vector, other_user_vector)
+
+def get_serendipity_score(content_score: float, collaborative_score: float,game_row: pd.Series) -> float:
+    mid_table_score = get_mid_table_affinity_score(content_score)
+    quality_score = get_quality_score(game_row)
+    positive_collaborative_score = max(0.0, collaborative_score)
+
+    serendipity_score = (
+        0.8 * mid_table_score
+        + 0.15 * positive_collaborative_score
+        + config.SERENDIPITY_QUALITY_WEIGHT * quality_score
+    )
+    return clamp_score(serendipity_score)
+
+def get_mid_table_affinity_score(content_score: float) -> float:
+    target_score = config.SERENDIPITY_TARGET_CONTENT_SCORE
+    allowed_deviation = max(config.SERENDIPITY_ALLOWED_DEVIATION, 0.0001)
+    distance_to_target = abs(clamp_score(content_score) - target_score)
+    return clamp_score(1.0 - (distance_to_target / allowed_deviation))
+
+def get_quality_score(game_row: pd.Series) -> float:
+    metascore = float(game_row.get(config.GAME_METASCORE_COLUMN, 0.0)) / 100.0
+    userscore = float(game_row.get(config.GAME_USERSCORE_COLUMN, 0.0)) / 100.0
+    return clamp_score((metascore + userscore) / 2.0)
+
+def clamp_score(value: float) -> float:
+    return max(0.0, min(1.0, value))
+
+def get_random_recommendation_sample(candidate_pool: list[dict[str, object]],k: int) -> list[dict[str, object]]:
+    if k <= 0 or not candidate_pool:
+        return []
+
+    sample_size = min(k, len(candidate_pool))
+    return random.sample(candidate_pool, sample_size)
 
 # Operaciones matemáticas
 def cosine_similarity(left: list[float], right: list[float]) -> float:
