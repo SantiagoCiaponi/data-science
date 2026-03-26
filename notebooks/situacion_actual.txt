@@ -4,11 +4,10 @@ Fase 1 de CRISP-DM terminada
 Fase 2
 	Actividad genérica 2.1 terminada
 	Actividad genérica 2.2 terminada
+	Actividad genérica 2.3 terminada hasta la 2.3.2
 
-A partir de la 2.2 hay varias cosas hechas pero no están revisadas.
+A partir de la 2.3.2 hay varias cosas hechas pero no están revisadas.
 
 PENDIENTES
 Seguir avanzando en las actividades genéricas en orden cronológico
 Corregir y pulir desde la 2.3
-Definir bien cómo vamos a hacer el cold-start: Preguntandole al usuario sus gustos, pero no hay que definir bien cómo.
-Definir variables que entran en el sistema recomendador: Mejor tomar esta decisión cuando llegue el momento en preparación de datos.
