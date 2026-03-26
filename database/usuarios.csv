@@ -1,5 +1,5 @@
-id,username,open_world_action_preference,fps_preference,survival_preference,action_rpg_preference,linear_action_adventure_preference
-2,"Ciaponi, Santiago",9.05,8.05,7.0,2.0,3.05
-1,juani,1.05,1.05,1.05,1.0,1.0
-3,juani,1.0,1.0,1.0,1.0,1.0
-4,string,0.0,0.0,0.0,0.0,0.0
+id,username,action_preference,adventure_preference,platformer_preference,puzzle_horror_preference,rpg_preference,racing_preference,shooter_preference,simulation_preference,sports_preference,strategy_preference
+1,leon_rpg,7.0,4.0,1.0,1.0,10.0,0.0,1.0,0.0,0.0,3.0
+2,chapa_fps,4.0,1.0,0.0,2.05,1.0,0.0,6.0,5.0,4.1,2.0
+3,facu_drive,1.0,0.0,0.0,0.0,0.0,9.0,0.0,10.0,7.0,2.0
+4,juani_horror,2.0,1.0,0.0,10.0,0.0,0.0,8.0,0.0,0.0,3.0

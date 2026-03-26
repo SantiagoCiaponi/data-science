@@ -1,5 +1,6 @@
 ### Parámetros para la lógica de recomendaciones
 RECOMMENDATION_CONTENT_WEIGHT = 0.8
+
 COLLABORATIVE_RANKING_MAP = {
     1: -1.0,
     2: -0.5,
@@ -10,20 +11,20 @@ COLLABORATIVE_RANKING_MAP = {
 
 PREFERENCE_MIN_VALUE = 0.0
 PREFERENCE_MAX_VALUE = 10.0
-PREFERENCE_UPDATE_ALPHA = 0.5
+PREFERENCE_UPDATE_ALPHA = 1.0
 
 RANKING_WEIGHT_MAP = {
-    1: -0.25,
-    2: -0.10,
+    1: -1.0,
+    2: -0.5,
     3: 0.0,
-    4: 0.20,
-    5: 0.10,
+    4: 0.75,
+    5: 1.0,
 }
 
 # Paths
 USERS_CSV = "database/usuarios.csv"
 PREFERENCES_CSV = "database/preferencias.csv"
-GAMES_CSV = "database/juegos.csv"
+GAMES_CSV = "database/games.csv"
 
 ### Columnas de los CSV
 # User
@@ -37,47 +38,73 @@ GAME_DESCRIPTION_COLUMN = "description"
 GAME_PLATFORMS_COLUMN = "platforms"
 GAME_METASCORE_COLUMN = "metascore"
 GAME_USERSCORE_COLUMN = "userscore"
+GAME_GENRES_COLUMN = "genres"
 
-# Preferencias 
+# Preferencias
 PREFERENCE_USER_ID_COLUMN = "userId"
 PREFERENCE_ITEM_ID_COLUMN = "itemId"
 PREFERENCE_RANKING_COLUMN = "ranking"
 
-# Preferencia de los usuarios sobre los géneros de los juegos
-OPEN_WORLD_ACTION_PREFERENCE = "open_world_action_preference"
-FPS_PREFERENCE = "fps_preference"
-SURVIVAL_PREFERENCE = "survival_preference"
-ACTION_RPG_PREFERENCE = "action_rpg_preference"
-LINEAR_ACTION_ADVENTURE_PREFERENCE = "linear_action_adventure_preference"
+# Géneros fijos de la base
+ACTION_GENRE = "Action"
+ADVENTURE_GENRE = "Adventure"
+PLATFORMER_GENRE = "Platformer"
+PUZZLE_HORROR_GENRE = "Puzzle/Horror"
+RPG_GENRE = "RPG"
+RACING_GENRE = "Racing"
+SHOOTER_GENRE = "Shooter"
+SIMULATION_GENRE = "Simulation"
+SPORTS_GENRE = "Sports"
+STRATEGY_GENRE = "Strategy"
 
-# One-hot encoding de géneros de juegos
-OPEN_WORLD_ACTION_COLUMN = "open_world_action"
-FPS_COLUMN = "fps"
-SURVIVAL_COLUMN = "survival"
-ACTION_RPG_COLUMN = "action_rpg"
-LINEAR_ACTION_ADVENTURE_COLUMN = "linear_action_adventure"
-
-# Listas de columnas
-GAME_COLUMNS = [
-    GAME_ID_COLUMN,
-    GAME_TITLE_COLUMN,
-    GAME_DESCRIPTION_COLUMN,
-    GAME_PLATFORMS_COLUMN,
-    GAME_METASCORE_COLUMN,
-    GAME_USERSCORE_COLUMN,
-    ACTION_RPG_COLUMN,
-    FPS_COLUMN,
-    LINEAR_ACTION_ADVENTURE_COLUMN,
-    OPEN_WORLD_ACTION_COLUMN,
-    SURVIVAL_COLUMN,
+DETECTED_GENRES = [
+    ACTION_GENRE,
+    ADVENTURE_GENRE,
+    PLATFORMER_GENRE,
+    PUZZLE_HORROR_GENRE,
+    RPG_GENRE,
+    RACING_GENRE,
+    SHOOTER_GENRE,
+    SIMULATION_GENRE,
+    SPORTS_GENRE,
+    STRATEGY_GENRE,
 ]
 
+ACTION_PREFERENCE = "action_preference"
+ADVENTURE_PREFERENCE = "adventure_preference"
+PLATFORMER_PREFERENCE = "platformer_preference"
+PUZZLE_HORROR_PREFERENCE = "puzzle_horror_preference"
+RPG_PREFERENCE = "rpg_preference"
+RACING_PREFERENCE = "racing_preference"
+SHOOTER_PREFERENCE = "shooter_preference"
+SIMULATION_PREFERENCE = "simulation_preference"
+SPORTS_PREFERENCE = "sports_preference"
+STRATEGY_PREFERENCE = "strategy_preference"
+
+GAME_TO_USER_ATTRIBUTE_MAP = {
+    ACTION_GENRE: ACTION_PREFERENCE,
+    ADVENTURE_GENRE: ADVENTURE_PREFERENCE,
+    PLATFORMER_GENRE: PLATFORMER_PREFERENCE,
+    PUZZLE_HORROR_GENRE: PUZZLE_HORROR_PREFERENCE,
+    RPG_GENRE: RPG_PREFERENCE,
+    RACING_GENRE: RACING_PREFERENCE,
+    SHOOTER_GENRE: SHOOTER_PREFERENCE,
+    SIMULATION_GENRE: SIMULATION_PREFERENCE,
+    SPORTS_GENRE: SPORTS_PREFERENCE,
+    STRATEGY_GENRE: STRATEGY_PREFERENCE,
+}
+
 USER_ATTRIBUTE_COLUMNS = [
-    OPEN_WORLD_ACTION_PREFERENCE,
-    FPS_PREFERENCE,
-    SURVIVAL_PREFERENCE,
-    ACTION_RPG_PREFERENCE,
-    LINEAR_ACTION_ADVENTURE_PREFERENCE,
+    ACTION_PREFERENCE,
+    ADVENTURE_PREFERENCE,
+    PLATFORMER_PREFERENCE,
+    PUZZLE_HORROR_PREFERENCE,
+    RPG_PREFERENCE,
+    RACING_PREFERENCE,
+    SHOOTER_PREFERENCE,
+    SIMULATION_PREFERENCE,
+    SPORTS_PREFERENCE,
+    STRATEGY_PREFERENCE,
 ]
 
 USER_COLUMNS = [
@@ -92,10 +119,37 @@ PREFERENCE_COLUMNS = [
     PREFERENCE_RANKING_COLUMN,
 ]
 
-GAME_TO_USER_ATTRIBUTE_MAP = {
-    OPEN_WORLD_ACTION_COLUMN: OPEN_WORLD_ACTION_PREFERENCE,
-    FPS_COLUMN: FPS_PREFERENCE,
-    SURVIVAL_COLUMN: SURVIVAL_PREFERENCE,
-    ACTION_RPG_COLUMN: ACTION_RPG_PREFERENCE,
-    LINEAR_ACTION_ADVENTURE_COLUMN: LINEAR_ACTION_ADVENTURE_PREFERENCE,
-}
+def normalize_genre_name(genre_name: str) -> str:
+    if genre_name == ACTION_GENRE:
+        return "action"
+    if genre_name == ADVENTURE_GENRE:
+        return "adventure"
+    if genre_name == PLATFORMER_GENRE:
+        return "platformer"
+    if genre_name == PUZZLE_HORROR_GENRE:
+        return "puzzle_horror"
+    if genre_name == RPG_GENRE:
+        return "rpg"
+    if genre_name == RACING_GENRE:
+        return "racing"
+    if genre_name == SHOOTER_GENRE:
+        return "shooter"
+    if genre_name == SIMULATION_GENRE:
+        return "simulation"
+    if genre_name == SPORTS_GENRE:
+        return "sports"
+    if genre_name == STRATEGY_GENRE:
+        return "strategy"
+    return genre_name.strip().lower()
+
+def get_detected_genres() -> list[str]:
+    return DETECTED_GENRES
+
+def get_game_to_user_attribute_map() -> dict[str, str]:
+    return GAME_TO_USER_ATTRIBUTE_MAP
+
+def get_user_attribute_columns() -> list[str]:
+    return USER_ATTRIBUTE_COLUMNS
+
+def get_user_columns() -> list[str]:
+    return USER_COLUMNS

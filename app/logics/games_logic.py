@@ -3,6 +3,21 @@ import config
 from fastapi import HTTPException
 from ..models import Game, Item
 
+def parse_game_genres(raw_genres: str) -> list[str]:
+    if not raw_genres:
+        return []
+    return [genre.strip() for genre in str(raw_genres).split(",") if genre.strip()]
+
+def get_game_genres(row: pd.Series) -> list[str]:
+    return parse_game_genres(row.get(config.GAME_GENRES_COLUMN, ""))
+
+def get_game_genre_flags(row: pd.Series) -> dict[str, int]:
+    detected_genres = set(get_game_genres(row))
+    return {
+        config.normalize_genre_name(genre_name): int(genre_name in detected_genres)
+        for genre_name in config.get_detected_genres()
+    }
+
 def build_game_from_row(row: pd.Series) -> Game:
     return Game(
         id=int(row[config.GAME_ID_COLUMN]),
@@ -11,19 +26,9 @@ def build_game_from_row(row: pd.Series) -> Game:
         platforms=row.get(config.GAME_PLATFORMS_COLUMN, ""),
         metascore=float(row.get(config.GAME_METASCORE_COLUMN, 0)),
         userscore=float(row.get(config.GAME_USERSCORE_COLUMN, 0)),
-        action_rpg=int(row.get(config.ACTION_RPG_COLUMN, 0)),
-        fps=int(row.get(config.FPS_COLUMN, 0)),
-        linear_action_adventure=int(row.get(config.LINEAR_ACTION_ADVENTURE_COLUMN, 0)),
-        open_world_action=int(row.get(config.OPEN_WORLD_ACTION_COLUMN, 0)),
-        survival=int(row.get(config.SURVIVAL_COLUMN, 0)),
+        genres=get_game_genres(row),
+        genreFlags=get_game_genre_flags(row),
     )
-
-def get_game_genres(row: pd.Series) -> list[str]:
-    genres = []
-    for column in config.GAME_TO_USER_ATTRIBUTE_MAP:
-        if int(row.get(column, 0)) == 1:
-            genres.append(column)
-    return genres
 
 def build_item_from_row(row: pd.Series) -> Item:
     return Item(
@@ -33,7 +38,11 @@ def build_item_from_row(row: pd.Series) -> Item:
     )
 
 def get_game_feature_vector(row: pd.Series) -> list[float]:
-    return [float(row.get(column, 0)) for column in config.GAME_TO_USER_ATTRIBUTE_MAP]
+    game_genres = set(get_game_genres(row))
+    return [
+        float(genre_name in game_genres)
+        for genre_name in config.get_game_to_user_attribute_map()
+    ]
 
 def read_games_df() -> pd.DataFrame:
     return pd.read_csv(config.GAMES_CSV)

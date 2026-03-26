@@ -26,16 +26,21 @@ def get_k_recommendations(user_id: int, k: int) -> list[Item]:
         # Calculamos score_contenido + score_colaborativo
         final_score = get_final_score(user, game_row)
 
-        scored_games.append((final_score, game_row))
+        scored_games.append(
+            {
+                "score": final_score,
+                "row": game_row,
+            }
+        )
 
     # Ordenamos los juegos de mayor a menor score_calculado
-    scored_games.sort(key=lambda game_data: game_data[0], reverse=True)
+    scored_games.sort(key=lambda game_data: game_data["score"], reverse=True)
 
-    # Tomamos los primeros k juegos y los convertimos a Item
-    return [
-        build_item_from_row(game_row)
-        for _, game_row in scored_games[:k]
-    ]
+    recommended_items: list[Item] = []
+    for game_data in scored_games[:k]:
+        recommended_items.append(build_item_from_row(game_data["row"]))
+
+    return recommended_items
 
 # Combina el score basado en contenido y el score colaborativo
 # score_final(u, i) = alpha * score_contenido(u, i) + (1 - alpha) * score_colaborativo(u, i)
@@ -117,10 +122,9 @@ def get_collaborative_score(user: User, game_id: int) -> float:
 
 # Calcula la similitud entre el usuario objetivo y otro usuario
 def get_similarity_between_users(target_user: User, other_user: User) -> float:
-    return cosine_similarity(
-        get_user_preference_vector(target_user),
-        get_user_preference_vector(other_user),
-    )
+    target_user_vector = get_user_preference_vector(target_user)
+    other_user_vector = get_user_preference_vector(other_user)
+    return cosine_similarity(target_user_vector, other_user_vector)
 
 # Operaciones matemáticas
 def cosine_similarity(left: list[float], right: list[float]) -> float:
@@ -131,8 +135,15 @@ def cosine_similarity(left: list[float], right: list[float]) -> float:
     return dot_product(left, right) / (left_norm * right_norm)
 
 def dot_product(left: list[float], right: list[float]) -> float:
-    return sum(left_value * right_value for left_value, right_value in zip(left, right))
+    total = 0.0
+    for index in range(min(len(left), len(right))):
+        total += left[index] * right[index]
+
+    return total
 
 def vector_norm(values: list[float]) -> float:
-    return math.sqrt(sum(value * value for value in values))
+    total = 0.0
+    for value in values:
+        total += value * value
 
+    return math.sqrt(total)

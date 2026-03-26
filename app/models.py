@@ -1,5 +1,5 @@
-from typing import List
-from pydantic import BaseModel
+from typing import Dict, List
+from pydantic import BaseModel, Field
 
 class Item(BaseModel):
     id: int
@@ -13,21 +13,14 @@ class Error(BaseModel):
     code: str
     message: str
 
-class UserAttributes(BaseModel):
-    open_world_action_preference: float
-    fps_preference: float
-    survival_preference: float
-    action_rpg_preference: float
-    linear_action_adventure_preference: float
-
 class User(BaseModel):
     id: int
     username: str
-    attributes: UserAttributes
+    attributes: Dict[str, float]
 
 class UserCreationDTO(BaseModel):
     username: str
-    attributes: UserAttributes
+    attributes: Dict[str, float] = Field(default_factory=dict)
 
 class Game(BaseModel):
     id: int
@@ -36,11 +29,8 @@ class Game(BaseModel):
     platforms: str
     metascore: float
     userscore: float
-    action_rpg: int
-    fps: int
-    linear_action_adventure: int
-    open_world_action: int
-    survival: int
+    genres: List[str]
+    genreFlags: Dict[str, int]
 
 class GameArray(BaseModel):
     games: List[Game]
@@ -60,4 +50,4 @@ class PreferenceCreatedResponse(BaseModel):
     userId: int
     itemId: int
     ranking: int
-    updatedAttributes: UserAttributes
+    updatedAttributes: Dict[str, float]
