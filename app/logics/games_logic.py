@@ -37,6 +37,8 @@ def build_item_from_row(row: pd.Series) -> Item:
         id=int(row[config.GAME_ID_COLUMN]),
         name=row[config.GAME_TITLE_COLUMN],
         genre=", ".join(get_game_genres(row)),
+        description=row.get(config.GAME_DESCRIPTION_COLUMN, ""),
+        userscore=float(row.get(config.GAME_USERSCORE_COLUMN, 0)),
     )
 
 # Construye el vector de features del juego para recomendaciones

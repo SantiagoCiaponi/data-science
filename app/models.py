@@ -14,6 +14,8 @@ class Item(BaseModel):
     id: int
     name: str
     genre: str
+    description: str
+    userscore: float
 
 class ItemArray(BaseModel):
     items: List[Item]
