@@ -1,10 +1,20 @@
-### Parámetros para la lógica de recomendaciones
-RECOMMENDATION_CONTENT_WEIGHT = 0.8
-RECOMMENDATION_SERENDIPITY_WEIGHT = 0.2
-SERENDIPITY_TARGET_CONTENT_SCORE = 0.2
-SERENDIPITY_ALLOWED_DEVIATION = 0.2
-SERENDIPITY_QUALITY_WEIGHT = 0.1
+### Parametros del sistema recomendador
 
+# Score final: peso del score base (contenido + colaborativo), serendipia y score global del juego.
+RECOMMENDATION_SERENDIPITY_WEIGHT = 0.15
+RECOMMENDATION_GAME_SCORE_WEIGHT = 0.05
+
+# Score base: balance entre afinidad por contenido y señal colaborativa.
+RECOMMENDATION_CONTENT_WEIGHT = 0.7
+
+# Score de serendipia: favorece items moderadamente afines, pero no obvios,
+# y evita que los candidatos inesperados tengan muy baja recepcion general.
+SERENDIPITY_TARGET_CONTENT_SCORE = 0.35
+SERENDIPITY_ALLOWED_DEVIATION = 0.15
+SERENDIPITY_MID_TABLE_WEIGHT = 0.85
+SERENDIPITY_GAME_SCORE_WEIGHT = 0.15
+
+# Transformacion del ranking para el componente colaborativo.
 COLLABORATIVE_RANKING_MAP = {
     1: -1.0,
     2: -0.5,
@@ -13,10 +23,12 @@ COLLABORATIVE_RANKING_MAP = {
     5: 1.0,
 }
 
+# Actualizacion incremental del perfil del usuario.
 PREFERENCE_MIN_VALUE = 0.0
 PREFERENCE_MAX_VALUE = 10.0
 PREFERENCE_UPDATE_ALPHA = 1.0
 
+# Transformacion del ranking para actualizar preferencias del usuario.
 RANKING_WEIGHT_MAP = {
     1: -1.0,
     2: -0.5,
@@ -48,7 +60,7 @@ PREFERENCE_USER_ID_COLUMN = "userId"
 PREFERENCE_ITEM_ID_COLUMN = "itemId"
 PREFERENCE_RANKING_COLUMN = "ranking"
 
-# Géneros fijos de la base
+# Generos fijos de la base
 ACTION_GENRE = "Action"
 ADVENTURE_GENRE = "Adventure"
 PLATFORMER_GENRE = "Platformer"

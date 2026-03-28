@@ -46,15 +46,20 @@ def get_k_recommendations(user_id: int, k: int) -> list[Item]:
 
     return recommended_items
 
-# Combina el score basado en contenido y el score colaborativo
-# score_final(u, i) = alpha * score_contenido(u, i) + (1 - alpha) * score_colaborativo(u, i)
+# Combina el score basado en contenido, el score colaborativo, el score de serendipia y el score global del juego
 def get_final_score(user: User, game_row: pd.Series) -> float:
     content_score = get_content_score(user, game_row)
     collaborative_score = get_collaborative_score(user, int(game_row[config.GAME_ID_COLUMN]))
     base_score = get_base_score(content_score, collaborative_score)
-    serendipity_score = get_serendipity_score(content_score, collaborative_score, game_row)
+
+    serendipity_score = get_serendipity_score(content_score, game_row)
     beta = config.RECOMMENDATION_SERENDIPITY_WEIGHT
-    return (1 - beta) * base_score + beta * serendipity_score
+    combined_recommendation_score = (1 - beta) * base_score + beta * serendipity_score
+
+    game_score = get_game_score(game_row)
+    gamma = config.RECOMMENDATION_GAME_SCORE_WEIGHT
+
+    return (1 - gamma) * combined_recommendation_score + gamma * game_score
 
 # Calcula el score basado en contenido entre un usuario y un juego
 # score_contenido(u, i) representa la afinidad entre ambos vectores
@@ -71,8 +76,39 @@ def get_base_score(content_score: float, collaborative_score: float) -> float:
 def transform_collaborative_ranking(ranking: int) -> float:
     return config.COLLABORATIVE_RANKING_MAP.get(ranking, 0.0)
 
+# Calcula la similitud entre el usuario objetivo y otro usuario
+def get_similarity_between_users(target_user: User, other_user: User) -> float:
+    target_user_vector = get_user_preference_vector(target_user)
+    other_user_vector = get_user_preference_vector(other_user)
+    return cosine_similarity(target_user_vector, other_user_vector)
+
+# Score Serendipia: Juegos moderadamente afines pero no obvios y con buena userscore
+def get_serendipity_score(content_score: float, game_row: pd.Series) -> float:
+    mid_table_score = get_mid_table_affinity_score(content_score)
+    game_score = get_game_score(game_row)
+    serendipity_score = (
+        config.SERENDIPITY_MID_TABLE_WEIGHT * mid_table_score + 
+        config.SERENDIPITY_GAME_SCORE_WEIGHT * game_score
+    )
+    return clamp_score(serendipity_score)
+
+# Obtiene una lista de preferencias del usuario modificada que nos ayude a encontrar juegos moderadamente afines
+def get_mid_table_affinity_score(content_score: float) -> float:
+    target_score = config.SERENDIPITY_TARGET_CONTENT_SCORE
+    allowed_deviation = max(config.SERENDIPITY_ALLOWED_DEVIATION, 0.0001)
+    distance_to_target = abs(clamp_score(content_score) - target_score)
+    return clamp_score(1.0 - (distance_to_target / allowed_deviation))
+
+# Usa el userscore del juego como una señal global de calidad para favorecer juegos bien recibidos por la comunidad
+def get_game_score(game_row: pd.Series) -> float:
+    userscore = float(game_row.get(config.GAME_USERSCORE_COLUMN, 0.0)) / 100.0
+    return clamp_score(userscore)
+
+def clamp_score(value: float) -> float:
+    return max(0.0, min(1.0, value))
+
 # Calcula el score colaborativo de un juego para un usuario
-# score_colaborativo(u, i) = sum(sim(u,v) * g(r_v_i)) / sum(|sim(u,v)|)
+# Qué tanto le gustó ese juego a otros usuarios, ponderado por la similitud entre ambos usuarios
 def get_collaborative_score(user: User, game_id: int) -> float:
     # Buscamos todas las preferencias cargadas para este juego
     game_preferences = get_preferences_for_item(game_id)
@@ -130,38 +166,7 @@ def get_collaborative_score(user: User, game_id: int) -> float:
     collaborative_score = total_weighted_score / total_similarity
     return collaborative_score
 
-# Calcula la similitud entre el usuario objetivo y otro usuario
-def get_similarity_between_users(target_user: User, other_user: User) -> float:
-    target_user_vector = get_user_preference_vector(target_user)
-    other_user_vector = get_user_preference_vector(other_user)
-    return cosine_similarity(target_user_vector, other_user_vector)
-
-def get_serendipity_score(content_score: float, collaborative_score: float,game_row: pd.Series) -> float:
-    mid_table_score = get_mid_table_affinity_score(content_score)
-    quality_score = get_quality_score(game_row)
-    positive_collaborative_score = max(0.0, collaborative_score)
-
-    serendipity_score = (
-        0.8 * mid_table_score
-        + 0.15 * positive_collaborative_score
-        + config.SERENDIPITY_QUALITY_WEIGHT * quality_score
-    )
-    return clamp_score(serendipity_score)
-
-def get_mid_table_affinity_score(content_score: float) -> float:
-    target_score = config.SERENDIPITY_TARGET_CONTENT_SCORE
-    allowed_deviation = max(config.SERENDIPITY_ALLOWED_DEVIATION, 0.0001)
-    distance_to_target = abs(clamp_score(content_score) - target_score)
-    return clamp_score(1.0 - (distance_to_target / allowed_deviation))
-
-def get_quality_score(game_row: pd.Series) -> float:
-    metascore = float(game_row.get(config.GAME_METASCORE_COLUMN, 0.0)) / 100.0
-    userscore = float(game_row.get(config.GAME_USERSCORE_COLUMN, 0.0)) / 100.0
-    return clamp_score((metascore + userscore) / 2.0)
-
-def clamp_score(value: float) -> float:
-    return max(0.0, min(1.0, value))
-
+# Nos ayuda a obtener una muestra aleatoria de juegos recomendados para agregar diversidad a las recomendaciones 
 def get_random_recommendation_sample(candidate_pool: list[dict[str, object]],k: int) -> list[dict[str, object]]:
     if k <= 0 or not candidate_pool:
         return []
