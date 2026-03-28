@@ -1,5 +1,14 @@
 from typing import Dict, List
-from pydantic import BaseModel, Field
+import config
+from pydantic import BaseModel, Field, create_model
+
+UserAttributes = create_model(
+    "UserAttributes",
+    **{
+        column: (float, Field(default=0.0))
+        for column in config.get_user_attribute_columns()
+    },
+)
 
 class Item(BaseModel):
     id: int
@@ -16,11 +25,11 @@ class Error(BaseModel):
 class User(BaseModel):
     id: int
     username: str
-    attributes: Dict[str, float]
+    attributes: UserAttributes
 
 class UserCreationDTO(BaseModel):
     username: str
-    attributes: Dict[str, float] = Field(default_factory=dict)
+    attributes: UserAttributes = Field(default_factory=UserAttributes)
 
 class Game(BaseModel):
     id: int
@@ -50,4 +59,4 @@ class PreferenceCreatedResponse(BaseModel):
     userId: int
     itemId: int
     ranking: int
-    updatedAttributes: Dict[str, float]
+    updatedAttributes: UserAttributes

@@ -28,7 +28,7 @@ RANKING_WEIGHT_MAP = {
 # Paths
 USERS_CSV = "database/usuarios.csv"
 PREFERENCES_CSV = "database/preferencias.csv"
-GAMES_CSV = "database/games.csv"
+GAMES_CSV = "database/juegos.csv"
 
 ### Columnas de los CSV
 # User
@@ -42,7 +42,6 @@ GAME_DESCRIPTION_COLUMN = "description"
 GAME_PLATFORMS_COLUMN = "platforms"
 GAME_METASCORE_COLUMN = "metascore"
 GAME_USERSCORE_COLUMN = "userscore"
-GAME_GENRES_COLUMN = "genres"
 
 # Preferencias
 PREFERENCE_USER_ID_COLUMN = "userId"
@@ -73,6 +72,21 @@ DETECTED_GENRES = [
     SPORTS_GENRE,
     STRATEGY_GENRE,
 ]
+
+GENRE_COLUMN_MAP = {
+    ACTION_GENRE: "action",
+    ADVENTURE_GENRE: "adventure",
+    PLATFORMER_GENRE: "platformer",
+    PUZZLE_HORROR_GENRE: "puzzle_horror",
+    RPG_GENRE: "rpg",
+    RACING_GENRE: "racing",
+    SHOOTER_GENRE: "shooter",
+    SIMULATION_GENRE: "simulation",
+    SPORTS_GENRE: "sports",
+    STRATEGY_GENRE: "strategy",
+}
+
+GAME_GENRE_COLUMNS = [(genre_name, GENRE_COLUMN_MAP[genre_name]) for genre_name in DETECTED_GENRES]
 
 ACTION_PREFERENCE = "action_preference"
 ADVENTURE_PREFERENCE = "adventure_preference"
@@ -117,40 +131,14 @@ USER_COLUMNS = [
     *USER_ATTRIBUTE_COLUMNS,
 ]
 
-PREFERENCE_COLUMNS = [
-    PREFERENCE_USER_ID_COLUMN,
-    PREFERENCE_ITEM_ID_COLUMN,
-    PREFERENCE_RANKING_COLUMN,
-]
-
-def normalize_genre_name(genre_name: str) -> str:
-    if genre_name == ACTION_GENRE:
-        return "action"
-    if genre_name == ADVENTURE_GENRE:
-        return "adventure"
-    if genre_name == PLATFORMER_GENRE:
-        return "platformer"
-    if genre_name == PUZZLE_HORROR_GENRE:
-        return "puzzle_horror"
-    if genre_name == RPG_GENRE:
-        return "rpg"
-    if genre_name == RACING_GENRE:
-        return "racing"
-    if genre_name == SHOOTER_GENRE:
-        return "shooter"
-    if genre_name == SIMULATION_GENRE:
-        return "simulation"
-    if genre_name == SPORTS_GENRE:
-        return "sports"
-    if genre_name == STRATEGY_GENRE:
-        return "strategy"
-    return genre_name.strip().lower()
-
-def get_detected_genres() -> list[str]:
-    return DETECTED_GENRES
-
 def get_game_to_user_attribute_map() -> dict[str, str]:
     return GAME_TO_USER_ATTRIBUTE_MAP
+
+def get_game_genre_columns() -> list[tuple[str, str]]:
+    return GAME_GENRE_COLUMNS
+
+def get_genre_column_name(genre_name: str) -> str:
+    return GENRE_COLUMN_MAP[genre_name]
 
 def get_user_attribute_columns() -> list[str]:
     return USER_ATTRIBUTE_COLUMNS

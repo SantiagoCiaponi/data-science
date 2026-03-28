@@ -3,3 +3,5 @@ id,username,action_preference,adventure_preference,platformer_preference,puzzle_
 2,chapa_fps,4.0,1.0,0.0,2.05,1.0,0.0,6.0,5.0,4.1,2.0
 3,facu_drive,1.0,0.0,0.0,0.0,0.0,9.0,0.0,10.0,7.0,2.0
 4,juani_horror,2.0,1.0,0.0,10.0,0.0,0.0,8.0,0.0,0.0,3.0
+5,test,1.0,1.0,2.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+6,test,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0

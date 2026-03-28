@@ -1,23 +1,24 @@
 import pandas as pd
 import config
-from fastapi import HTTPException
+from ..exceptions import GameNotFoundException
 from ..models import Game, Item
 
-def parse_game_genres(raw_genres: str) -> list[str]:
-    if not raw_genres:
-        return []
-    return [genre.strip() for genre in str(raw_genres).split(",") if genre.strip()]
-
+# Devuelve la lista de géneros activos de un juego
 def get_game_genres(row: pd.Series) -> list[str]:
-    return parse_game_genres(row.get(config.GAME_GENRES_COLUMN, ""))
+    return [
+        genre_name
+        for genre_name, column_name in config.get_game_genre_columns()
+        if int(float(row.get(column_name, 0)) > 0) == 1
+    ]
 
+# Devuelve los flags one-hot del juego en formato diccionario
 def get_game_genre_flags(row: pd.Series) -> dict[str, int]:
-    detected_genres = set(get_game_genres(row))
     return {
-        config.normalize_genre_name(genre_name): int(genre_name in detected_genres)
-        for genre_name in config.get_detected_genres()
+        column_name: int(float(row.get(column_name, 0)) > 0)
+        for _, column_name in config.get_game_genre_columns()
     }
 
+# Mapea una fila del DataFrame a un Game
 def build_game_from_row(row: pd.Series) -> Game:
     return Game(
         id=int(row[config.GAME_ID_COLUMN]),
@@ -30,6 +31,7 @@ def build_game_from_row(row: pd.Series) -> Game:
         genreFlags=get_game_genre_flags(row),
     )
 
+# Mapea una fila del DataFrame a un Item
 def build_item_from_row(row: pd.Series) -> Item:
     return Item(
         id=int(row[config.GAME_ID_COLUMN]),
@@ -37,22 +39,24 @@ def build_item_from_row(row: pd.Series) -> Item:
         genre=", ".join(get_game_genres(row)),
     )
 
+# Construye el vector de features del juego para recomendaciones
 def get_game_feature_vector(row: pd.Series) -> list[float]:
-    game_genres = set(get_game_genres(row))
     return [
-        float(genre_name in game_genres)
-        for genre_name in config.get_game_to_user_attribute_map()
+        float(float(row.get(column_name, 0)) > 0)
+        for _, column_name in config.get_game_genre_columns()
     ]
 
+# Devuelve todos los juegos en formato DataFrame
 def read_games_df() -> pd.DataFrame:
     return pd.read_csv(config.GAMES_CSV)
 
+# Devuelve la fila de un juego a partir de su ID
 def get_game_row(game_id: int) -> pd.Series:
     df = read_games_df()
     game_row = df[df[config.GAME_ID_COLUMN] == game_id]
 
     if game_row.empty:
-        raise HTTPException(status_code=404, detail=f"Juego {game_id} no encontrado")
+        raise GameNotFoundException(game_id)
 
     return game_row.iloc[0]
 
