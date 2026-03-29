@@ -1,11 +1,24 @@
+from pathlib import Path
+
 from fastapi import FastAPI, Query
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from .models import (Game, GameArray, ItemArray, PreferenceCreateDTO, PreferenceCreatedResponse, User, UserCreationDTO)
 from .logics.games_logic import get_all_games, get_game
 from .logics.preferences_logic import create_preference
 from .logics.recommendations_logic import get_k_recommendations
 from .logics.users_logic import create_user, get_csv_user
 
-app = FastAPI(title="Sistema Recomendador - Ciencia de Datos 2025", docs_url="/")
+BASE_DIR = Path(__file__).resolve().parent
+STATIC_DIR = BASE_DIR / "static"
+
+app = FastAPI(title="Sistema Recomendador - Ciencia de Datos 2025", docs_url="/docs")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
+
+@app.get("/", include_in_schema=False)
+async def frontend():
+    return FileResponse(STATIC_DIR / "index.html")
 
 @app.post("/user", response_model=User, tags=["CRUD: Usuario"])
 async def create_user_endpoint(payload: UserCreationDTO):

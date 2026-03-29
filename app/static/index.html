@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Recomendador</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <main class="container">
+    <section class="card">
+      <h2>Usuario activo</h2>
+      <div id="active-user" class="result muted">
+        Ningún usuario seleccionado.
+      </div>
+    </section>
+
+    <header class="hero">
+      <h1>Sistema Recomendador de Juegos</h1>
+      <p class="subtitle">
+        Crea o busca un usuario, cargá una preferencia y pedí recomendaciones usando los endpoints del backend.
+      </p>
+    </header>
+
+    <section class="card">
+      <h2>1. Elegir usuario</h2>
+      <div class="grid two-columns">
+        <div class="panel">
+          <h3>Crear usuario</h3>
+          <p class="meta">Abrí el formulario y cargá el nombre junto con las preferencias iniciales del perfil.</p>
+          <button id="open-create-user-modal" type="button">Abrir formulario</button>
+        </div>
+
+        <form id="load-user-form" class="panel">
+          <h3>Cargar usuario existente</h3>
+          <label for="user-id">ID</label>
+          <input id="user-id" name="userId" type="number" min="1" placeholder="Ej: 1" required>
+          <button type="submit">Buscar usuario</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2. Calificar un juego</h2>
+      <form id="preference-form" class="grid preference-grid">
+        <div>
+          <label for="game-select">Juego</label>
+          <select id="game-select" name="itemId" required>
+            <option value="">Cargando juegos...</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="ranking">Ranking</label>
+          <select id="ranking" name="ranking" required>
+            <option value="1">1 - No me gustó</option>
+            <option value="2">2 - Flojo</option>
+            <option value="3">3 - Neutral</option>
+            <option value="4">4 - Me gustó</option>
+            <option value="5" selected>5 - Me encantó</option>
+          </select>
+        </div>
+
+        <button type="submit">Guardar preferencia</button>
+      </form>
+
+      <div id="selected-game" class="result muted">
+        Elegí un juego para ver su detalle.
+      </div>
+      <div id="preference-result" class="result muted">
+        Aún no se registraron preferencias desde esta página.
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>3. Pedir recomendaciones</h2>
+      <form id="recommend-form" class="recommend-controls">
+        <label for="recommend-count">Cantidad</label>
+        <input id="recommend-count" name="count" type="number" min="1" max="20" value="5" required>
+        <button type="submit">Obtener recomendaciones</button>
+      </form>
+
+      <div id="recommendations" class="recommendations empty">
+        Todavía no hay recomendaciones para mostrar.
+      </div>
+    </section>
+  </main>
+
+  <div id="create-user-modal" class="modal hidden" aria-hidden="true">
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="create-user-title">
+      <div class="modal-header">
+        <div>
+          <p class="overline">Nuevo usuario</p>
+          <h2 id="create-user-title">Crear perfil</h2>
+        </div>
+        <button id="close-create-user-modal" class="icon-button" type="button" aria-label="Cerrar modal">x</button>
+      </div>
+
+      <form id="create-user-form" class="modal-form">
+        <label for="modal-username">Nombre</label>
+        <input id="modal-username" name="username" type="text" placeholder="Ej: juan" required>
+
+        <div class="modal-copy">
+          Completá las preferencias iniciales entre `0` y `10`. Si no querés tocar alguna, dejala en `0`.
+        </div>
+
+        <div class="grid preference-attributes">
+          <div>
+            <label for="action_preference">Action</label>
+            <input id="action_preference" name="action_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+          <div>
+            <label for="adventure_preference">Adventure</label>
+            <input id="adventure_preference" name="adventure_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+          <div>
+            <label for="platformer_preference">Platformer</label>
+            <input id="platformer_preference" name="platformer_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+          <div>
+            <label for="puzzle_horror_preference">Puzzle/Horror</label>
+            <input id="puzzle_horror_preference" name="puzzle_horror_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+          <div>
+            <label for="rpg_preference">RPG</label>
+            <input id="rpg_preference" name="rpg_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+          <div>
+            <label for="racing_preference">Racing</label>
+            <input id="racing_preference" name="racing_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+          <div>
+            <label for="shooter_preference">Shooter</label>
+            <input id="shooter_preference" name="shooter_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+          <div>
+            <label for="simulation_preference">Simulation</label>
+            <input id="simulation_preference" name="simulation_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+          <div>
+            <label for="sports_preference">Sports</label>
+            <input id="sports_preference" name="sports_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+          <div>
+            <label for="strategy_preference">Strategy</label>
+            <input id="strategy_preference" name="strategy_preference" type="number" min="0" max="10" step="0.1" value="0">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="secondary-button" id="cancel-create-user" type="button">Cancelar</button>
+          <button type="submit">Crear usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
