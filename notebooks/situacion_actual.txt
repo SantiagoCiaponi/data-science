@@ -4,6 +4,6 @@ Fase 1 de CRISP-DM terminada
 Fase 2
 	Actividad genérica 2.1 terminada
 	Actividad genérica 2.2 terminada
-	Actividad genérica 2.3 terminada hasta la 2.3.4
+	Actividad genérica 2.3 terminada
 
-Para terminar la 2.3 faltan incluir lo que mando León al ds, los dos análisis pendientes anotados al principio de la 2.3 y después revisar si no hay algún análisis importante que pasamos por alto. Y después seguir con el resto de actividades y fases.
+
