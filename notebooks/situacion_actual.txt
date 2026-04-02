@@ -1,9 +1,7 @@
 SITUACIÓN ACTUAL
-Fase 1 de CRISP-DM terminada
+Fase 1 terminada
+Fase 2 terminada
+Fase 3 semi-terminada, falta revisar un toquesito la 3.5 (transformación de datos)
 
-Fase 2
-	Actividad genérica 2.1 terminada
-	Actividad genérica 2.2 terminada
-	Actividad genérica 2.3 terminada
 
 
