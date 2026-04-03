@@ -1,7 +1,7 @@
 SITUACIÓN ACTUAL
 Fase 1 terminada
 Fase 2 terminada
-Fase 3 semi-terminada, falta revisar un toquesito la 3.5 (transformación de datos)
+Fase 3 terminada
 
 
 
