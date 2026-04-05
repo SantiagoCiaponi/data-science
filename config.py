@@ -40,7 +40,7 @@ RANKING_WEIGHT_MAP = {
 # Paths
 USERS_CSV = "database/usuarios.csv"
 PREFERENCES_CSV = "database/preferencias.csv"
-GAMES_CSV = "database/juegos.csv"
+GAMES_CSV = "database/games_preparado.csv"
 
 ### Columnas de los CSV
 # User
@@ -86,16 +86,16 @@ DETECTED_GENRES = [
 ]
 
 GENRE_COLUMN_MAP = {
-    ACTION_GENRE: "action",
-    ADVENTURE_GENRE: "adventure",
-    PLATFORMER_GENRE: "platformer",
-    PUZZLE_HORROR_GENRE: "puzzle_horror",
-    RPG_GENRE: "rpg",
-    RACING_GENRE: "racing",
-    SHOOTER_GENRE: "shooter",
-    SIMULATION_GENRE: "simulation",
-    SPORTS_GENRE: "sports",
-    STRATEGY_GENRE: "strategy",
+    ACTION_GENRE: "Action",
+    ADVENTURE_GENRE: "Adventure",
+    PLATFORMER_GENRE: "Platformer",
+    PUZZLE_HORROR_GENRE: "Puzzle/Horror",
+    RPG_GENRE: "Rpg",
+    RACING_GENRE: "Racing",
+    SHOOTER_GENRE: "Shooter",
+    SIMULATION_GENRE: "Simulation",
+    SPORTS_GENRE: "Sports",
+    STRATEGY_GENRE: "Strategy",
 }
 
 GAME_GENRE_COLUMNS = [(genre_name, GENRE_COLUMN_MAP[genre_name]) for genre_name in DETECTED_GENRES]

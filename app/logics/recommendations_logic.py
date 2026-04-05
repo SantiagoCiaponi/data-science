@@ -101,7 +101,7 @@ def get_mid_table_affinity_score(content_score: float) -> float:
 
 # Usa el userscore del juego como una señal global de calidad para favorecer juegos bien recibidos por la comunidad
 def get_game_score(game_row: pd.Series) -> float:
-    userscore = float(game_row.get(config.GAME_USERSCORE_COLUMN, 0.0)) / 100.0
+    userscore = float(game_row.get(config.GAME_USERSCORE_COLUMN, 0.0))
     return clamp_score(userscore)
 
 def clamp_score(value: float) -> float:
