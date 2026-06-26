@@ -1,11 +1,11 @@
 ### Parametros del sistema recomendador
 
 # Score final: peso del score base (contenido + colaborativo), serendipia y score global del juego.
-RECOMMENDATION_SERENDIPITY_WEIGHT = 0.08
-RECOMMENDATION_GAME_SCORE_WEIGHT = 0.02
+RECOMMENDATION_SERENDIPITY_WEIGHT = 0.10
+RECOMMENDATION_GAME_SCORE_WEIGHT = 0.10
 
 # Score base: balance entre afinidad por contenido y señal colaborativa.
-RECOMMENDATION_CONTENT_WEIGHT = 0.90
+RECOMMENDATION_CONTENT_WEIGHT = 0.70
 
 # Score de serendipia: favorece items moderadamente afines, pero no obvios,
 # y evita que los candidatos inesperados tengan muy baja recepcion general.
